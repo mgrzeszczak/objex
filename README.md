@@ -22,6 +22,10 @@ Regex regex = Regex.builder()
 Assert.assertTrue(regex.match("start_00-aa_01-ab_02-ac_end").matches());
 ```
 
+# Download
+
+[![](https://jitpack.io/v/mgrzeszczak/objex.svg)](https://jitpack.io/#mgrzeszczak/objex)
+
 # License
 ```
 MIT License
