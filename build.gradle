@@ -1,0 +1,67 @@
+group 'github.com.mgrzeszczak'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'groovy'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir "${projectDir}/build/generated/java"
+        }
+    }
+}
+
+task('generateGroups') {
+    doLast {
+        def classNamePlaceholder = '%ClassName%'
+        def parentClassPlaceholder = '%ParentClass%'
+        def groupMethodPlaceholder = '%GroupMethod%'
+        def childClassPlaceholder = '%ChildClass%'
+        def regexGroupTemplateFilePath = 'src/main/resources/RegexGroupTemplate'
+        def groupMethodTemplateFilePath = 'src/main/resources/GroupMethodTemplate'
+
+        def regexGroupTemplateFile = new File(regexGroupTemplateFilePath)
+        def groupMethodTemplateFile = new File(groupMethodTemplateFilePath)
+
+        def regexGroupTemplate = regexGroupTemplateFile.text
+        def groupMethodTemplate = groupMethodTemplateFile.text
+
+        def depth = 8
+
+        for (def i=0; i < depth; i++) {
+            def className = "RegexGroup$i"
+            def parentClassName = i == 0 ? "RegexBuilder" : "RegexGroup${i-1}"
+            def childClassName = "RegexGroup${i+1}"
+
+            def body = regexGroupTemplate
+                    .replaceAll(classNamePlaceholder, className)
+                    .replaceAll(parentClassPlaceholder, parentClassName)
+                    .replaceAll(groupMethodPlaceholder, i == depth-1? '' : groupMethodTemplate.replaceAll(childClassPlaceholder, childClassName))
+
+            def dir = new File("build/generated/java/github/com/mgrzeszczak/objex")
+            if (!dir.exists()) {
+                dir.mkdirs()
+            }
+            def file = new File("build/generated/java/github/com/mgrzeszczak/objex/${className}.java")
+            //def file = new File("src/main/java/github/com/mgrzeszczak/objex/${className}.java")
+            file.write(body)
+        }
+
+    }
+}
+
+compileJava.dependsOn generateGroups
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile 'org.assertj:assertj-core:3.6.2'
+    testCompile 'org.spockframework:spock-core:1.1-groovy-2.4-rc-2'
+    testCompile 'org.codehaus.groovy:groovy-all:2.4.9'
+}

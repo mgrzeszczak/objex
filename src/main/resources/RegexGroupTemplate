@@ -1,0 +1,117 @@
+package github.com.mgrzeszczak.objex;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+final public class %ClassName% {
+
+    private List<Object> components = new ArrayList<>();
+    private final %ParentClass% parent;
+
+    %ClassName%(%ParentClass% parent) {
+        this.parent = parent;
+        this.components.add(RegexConstants.OPEN_GROUP);
+    }
+
+    public %ParentClass% once() {
+        close("");
+        return parent;
+    }
+
+    public %ParentClass% times(int times) {
+        assert times >= 0 : "expected non-negative value";
+        String suffix = String.format("{%d}", times);
+        close(suffix);
+        return parent;
+    }
+
+    public %ParentClass% atLeast(int times) {
+        assert times >= 0 : "expected non-negative value";
+        String suffix = String.format("{%d,}", times);
+        close(suffix);
+        return parent;
+    }
+
+    public %ParentClass% optional() {
+        String suffix = "?";
+        close(suffix);
+        return parent;
+    }
+
+    public %ParentClass% atMost(int times) {
+        assert times >= 0 : "expected non-negative value";
+        String suffix = String.format("{0,%d}", times);
+        close(suffix);
+        return parent;
+    }
+
+    public %ParentClass% between(int minTimes, int maxTimes) {
+        assert minTimes >= 0 : "expected non-negative value";
+        assert maxTimes >= 0 : "expected non-negative value";
+        assert maxTimes >= minTimes : "expected maxTimes >= minTimes";
+        String suffix = String.format("{%d,%d}", minTimes, maxTimes);
+        close(suffix);
+        return parent;
+    }
+
+    public %ParentClass% zeroOrMore() {
+        String suffix = "*";
+        close(suffix);
+        return parent;
+    }
+
+    public %ClassName% digit() {
+        components.add(RegexConstants.DIGIT);
+        return this;
+    }
+
+    public %ClassName% nonDigit() {
+        components.add(RegexConstants.NON_DIGIT);
+        return this;
+    }
+
+    public %ClassName% wordCharacter() {
+        components.add(RegexConstants.WORD_CHARACTER);
+        return this;
+    }
+
+    public %ClassName% nonWordCharacter() {
+        components.add(RegexConstants.NON_WORD_CHARACTER);
+        return this;
+    }
+
+    public %ClassName% whitespace() {
+        components.add(RegexConstants.WHITESPACE);
+        return this;
+    }
+
+    public %ClassName% nonWhitespace() {
+        components.add(RegexConstants.NON_WHITESPACE);
+        return this;
+    }
+
+    public %ClassName% phrase(String string) {
+        components.add(string);
+        return this;
+    }
+
+    public %ClassName% character(char character) {
+        components.add(String.valueOf(character));
+        return this;
+    }
+
+    %GroupMethod%
+
+    private void close(String suffix) {
+        this.components.add(RegexConstants.CLOSE_GROUP);
+        components.add(suffix);
+    }
+
+    @Override
+    public String toString() {
+        return components.stream()
+                .map(Object::toString)
+                .collect(Collectors.joining());
+    }
+}
